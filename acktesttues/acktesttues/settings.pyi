@@ -10,8 +10,15 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+<<<<<<< HEAD
 
 # SECURITY
+=======
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
+
+# SECURITY WARNING: keep the secret key used in production secret!
+>>>>>>> 33f39fd367a62f9318119fdae5eff9b62ec5ab6b
 SECRET_KEY = 'django-insecure-i8*kr7s=*d!&!*98212ksb966(h+8@t7f&7wbmfpehen!fer9+'
 DEBUG = True
 ALLOWED_HOSTS = []
@@ -102,6 +109,7 @@ USE_TZ = True
 # STATIC FILES
 STATIC_URL = 'static/'
 
+<<<<<<< HEAD
 
 # MEDIA FILES
 MEDIA_URL = '/media/'
@@ -116,3 +124,8 @@ LOGOUT_REDIRECT_URL = 'login'
 
 # DEFAULT PRIMARY KEY FIELD TYPE
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+=======
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+>>>>>>> 33f39fd367a62f9318119fdae5eff9b62ec5ab6b

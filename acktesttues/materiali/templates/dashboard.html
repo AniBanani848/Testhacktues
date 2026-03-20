@@ -1,3 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Welcome back, {{ user.username }}!</h1>
+    <p>You are currently learning: <strong>{{ user.profile.learning_focus }}</strong></p>
+    
+    <div class="row">
+        </div>
+{% endblock %}
+
 <h2>Welcome! You are learning: {{ major }}</h2>
 
 <form method="POST" enctype="multipart/form-data">
@@ -18,3 +27,18 @@
 {% empty %}
     <p>No resources found for your major yet. Be the first to upload!</p>
 {% endfor %}
+
+<div class="card">
+    <h3>{{ item.title }}</h3>
+    <p>Uploaded by: {{ item.uploader.username }}</p>
+
+    {% if item.uploader == user %}
+        <div class="owner-controls">
+            <a href="{% url 'edit_resource' item.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
+            <form action="{% url 'delete_resource' item.pk %}" method="POST" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+            </form>
+        </div>
+    {% endif %}
+</div>
