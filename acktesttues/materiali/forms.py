@@ -8,7 +8,10 @@ class UserRegistrationForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['username', 'email', 'password']
-
+class SupplyForm(forms.ModelForm):
+    class Meta:
+        model = Supply
+        fields = ['item_name', 'description']
 class ResourceForm(forms.ModelForm):
     class Meta:
         model = Resource

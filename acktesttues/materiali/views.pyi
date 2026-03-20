@@ -1,8 +1,32 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Profile, Resource, Supply
-from .forms import ResourceForm
+from .forms import ResourceForm, SupplyForm
 from acktesttues.materiali import models
+from django.core.exceptions import PermissionDenied
+
+@login_required
+def delete_resource(request, pk):
+    resource = get_object_or_404(Resource, pk=pk)
+    if resource.uploader != request.user:
+        raise PermissionDenied("You do not have permission to delete this resource.")
+    if request.method == 'POST':
+        resource.delete()
+        return redirect('dashboard')
+    return render(request, 'confirm_delete.html', {'resource': resource})
+
+@login_required
+def add_supply(request):
+    if request.method == 'POST':
+        form = SupplyForm(request.POST)
+        if form.is_valid():
+            item = form.save(commit=False)
+            item.owner = request.user # Link the item to the logged-in user
+            item.save()
+            return redirect('marketplace')
+    else:
+        form = SupplyForm()
+    return render(request, 'add_supply.html', {'form': form})
 
 def marketplace(request):
     user_focus = request.user.profile.learning_focus
