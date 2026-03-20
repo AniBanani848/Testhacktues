@@ -16,10 +16,16 @@ class Resource(models.Model):
     file = models.FileField(upload_to='resources/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
     course_code = models.CharField(max_length=20, blank=True)  # Optional: Course code (e.g., "CS101")
+    def save(self, *args, **kwargs):
+        # Automatically make the course code uppercase before saving
+        self.course_code = self.course_code.upper()
+        super().save(*args, **kwargs)
+
 
 class Supply(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     item_name = models.CharField(max_length=100)
     description = models.TextField()
     is_available = models.BooleanField(default=True)
+
 
