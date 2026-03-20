@@ -2,6 +2,7 @@ from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from .models import Profile, Resource, Supply
 from .forms import ResourceForm
+from acktesttues.materiali import models
 
 @login_required
 def dashboard(request):
@@ -25,3 +26,16 @@ def dashboard(request):
         'major': user_major,
     }
     return render(request, 'materiali/dashboard.html', context)
+
+def resource_list(request):
+    query = request.GET.get('q')
+    if query:
+        results = Resource.objects.filter(
+            models.Q(course_code__icontains=query) |
+            models.Q(subject__icontains=query) |
+            models.Q(title__icontains=query)
+        )
+    else:
+        resources = Resource.objects.all()
+
+    return render(request, 'materiali/resource_list.html', {'resources': results})
