@@ -15,9 +15,11 @@ class Resource(models.Model):
     # The actual file (PDF, Image, etc.)
     file = models.FileField(upload_to='resources/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
+    course_code = models.CharField(max_length=20, blank=True)  # Optional: Course code (e.g., "CS101")
 
 class Supply(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     item_name = models.CharField(max_length=100)
     description = models.TextField()
     is_available = models.BooleanField(default=True)
+
