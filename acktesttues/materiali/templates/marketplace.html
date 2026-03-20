@@ -1,0 +1,22 @@
+<form method="GET" action="">
+    <input type="text" name="search" placeholder="Search for books, calculators...">
+    <button type="submit">Search</button>
+</form>
+
+<div class="supply-grid" style="display: flex; flex-wrap: wrap; gap: 20px;">
+    {% for item in supplies %}
+    <div class="supply-card" style="border: 1px solid #ddd; padding: 15px; border-radius: 8px; width: 250px;">
+        <h3>{{ item.item_name }}</h3>
+        <p>{{ item.description|truncatewords:15 }}</p>
+        <p><strong>Owner:</strong> {{ item.owner.username }}</p>
+        <p><strong>Learning:</strong> {{ item.owner.profile.learning_focus }}</p>
+        
+        <a href="mailto:{{ item.owner.email }}?subject=Interest in {{ item.item_name }}" 
+           style="background: #28a745; color: white; padding: 10px; text-decoration: none; display: block; text-align: center;">
+           Contact Owner
+        </a>
+    </div>
+    {% empty %}
+    <p>No supplies found. Check back later!</p>
+    {% endfor %}
+</div>

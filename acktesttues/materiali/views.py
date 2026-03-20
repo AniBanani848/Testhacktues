@@ -4,6 +4,18 @@ from .models import Profile, Resource, Supply
 from .forms import ResourceForm
 from acktesttues.materiali import models
 
+def marketplace(request):
+    user_focus = request.user.profile.learning_focus
+    query = request.GET.get('search')
+    if query:
+        supplies = Supply.objects.filter(item_name__icontains=query, is_available=True)
+    else:
+        supplies = Supply.objects.filter(is_available=True).order_by('-id')  # Show newest first
+        return render(request, 'marketplace.html', {
+            'supplies': supplies,
+            'user_focus': user_focus,
+        })
+
 @login_required
 def dashboard(request):
     user_major = request.user.profile.current_major
