@@ -1,0 +1,16 @@
+<form method="GET" action="{% url 'resource_list' %}">
+    <input type="text" name="q" placeholder="Search by Course Code (e.g. CS101)..." value="{{ query }}">
+    <button type="submit">Search</button>
+</form>
+
+<hr>
+
+{% for res in resources %}
+    <div class="card">
+        <h3>{{ res.title }}</h3>
+        <span class="badge">{{ res.course_code }}</span> <p>Subject: {{ res.subject }}</p>
+        <a href="{{ res.file.url }}">Download</a>
+    </div>
+{% empty %}
+    <p>No resources found for "{{ query }}".</p>
+{% endfor %}

@@ -1,0 +1,20 @@
+<h2>Welcome! You are learning: {{ major }}</h2>
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Upload Resource</button>
+</form>
+
+<hr>
+
+<h3>Recommended for You</h3>
+{% for item in resources %}
+    <div style="border: 1px solid #ccc; margin: 10px; padding: 10px;">
+        <h4>{{ item.title }} ({{ item.subject }})</h4>
+        <p>Uploaded by: {{ item.uploader.username }}</p>
+        <a href="{{ item.file.url }}" download>Download File</a>
+    </div>
+{% empty %}
+    <p>No resources found for your major yet. Be the first to upload!</p>
+{% endfor %}
