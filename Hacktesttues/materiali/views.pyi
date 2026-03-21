@@ -2,7 +2,7 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Profile, Resource, Supply
 from .forms import ResourceForm, SupplyForm
-from acktesttues.materiali import models
+from Hacktesttues.materiali import models
 from django.core.exceptions import PermissionDenied
 
 @login_required
