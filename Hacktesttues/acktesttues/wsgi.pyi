@@ -17,7 +17,7 @@ if path not in sys.path:
 if f"{path}/acktesttues" not in sys.path:
     sys.path.append(f"{path}/acktesttues")
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings.pyi')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'acktesttues.settings')
 get_wsgi_application = None
 try:
     from django.core.wsgi import get_wsgi_application
