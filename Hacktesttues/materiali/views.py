@@ -185,10 +185,22 @@ def resource_list(request):
             | Q(subject__icontains=query)
             | Q(title__icontains=query)
         )
+    
+    if request.method == 'POST':
+        form = ResourceForm(request.POST, request.FILES)
+        if form.is_valid():
+            resource = form.save(commit=False)
+            resource.uploader = request.user
+            resource.save()
+            messages.success(request, 'Resource uploaded successfully!')
+            return redirect('resource_list')
+    else:
+        form = ResourceForm()
+    
     return render(
         request,
         'resources.html',
-        {'resources': qs, 'query': query},
+        {'resources': qs, 'query': query, 'form': form},
     )
 
 
