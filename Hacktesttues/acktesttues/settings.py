@@ -19,9 +19,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-i8*kr7s=*d!&!*98212ksb966(h+8@t7f&7wbmfpehen!fer9+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['MEAh1.pythonanywhere.com']
+ALLOWED_HOSTS = []
 
 # APPLICATIONS
 INSTALLED_APPS = [
@@ -106,7 +106,7 @@ USE_TZ = True
 
 
 # STATIC FILES
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 
 # MEDIA FILES
