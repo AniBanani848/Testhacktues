@@ -11,7 +11,7 @@ class Profile(models.Model):
     bio = models.TextField(blank=True)
     # Optional: A profile picture
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
-    def __clstr__(self):
+    def __str__(self):
         return f"{self.user.username}'s Profile"
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
@@ -21,14 +21,6 @@ def create_user_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
-
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    # What the user is learning (e.g., "Computer Science", "Biology")
-    current_major = models.CharField(max_length=100)
-    bio = models.TextField(blank=True)
-    # Optional: A profile picture
-    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
 
 class Resource(models.Model):
     uploader = models.ForeignKey(User, on_delete=models.CASCADE)
