@@ -39,6 +39,29 @@ class UserRegistrationForm(forms.ModelForm):
             raise forms.ValidationError('Passwords do not match.')
         return p2
 
+    def clean_email(self):
+        email = (self.cleaned_data.get('email') or '').strip()
+        if not email:
+            raise forms.ValidationError('Email is required so we can send your verification code.')
+        return email
+
+
+class VerifyEmailForm(forms.Form):
+    code = forms.CharField(
+        max_length=6,
+        min_length=6,
+        label='Verification code',
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control text-center fs-4 tracking-wider',
+                'placeholder': '000000',
+                'inputmode': 'numeric',
+                'pattern': '[0-9]{6}',
+                'autocomplete': 'one-time-code',
+            },
+        ),
+    )
+
 
 class ProfileForm(forms.ModelForm):
     class Meta:

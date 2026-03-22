@@ -20,6 +20,9 @@ class Profile(models.Model):
     )
     bio = models.TextField(blank=True)
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    email_verified = models.BooleanField(default=False)
+    email_verification_code = models.CharField(max_length=6, blank=True, default='')
+    email_verification_sent_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
@@ -32,7 +35,11 @@ def create_or_update_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.get_or_create(
             user=instance,
-            defaults={'current_major': '', 'learning_focus': ''},
+            defaults={
+                'current_major': '',
+                'learning_focus': '',
+                'email_verified': instance.is_superuser or instance.is_staff,
+            },
         )
     else:
         try:

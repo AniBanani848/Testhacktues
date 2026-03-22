@@ -5,7 +5,8 @@ from .models import Profile, Resource, Supply
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'current_major', 'learning_focus')
+    list_display = ('user', 'email_verified', 'current_major', 'learning_focus')
+    list_filter = ('email_verified',)
     search_fields = ('user__username', 'current_major', 'learning_focus')
 
 
