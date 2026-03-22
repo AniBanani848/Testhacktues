@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Friends — StudyLink{% endblock %}
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h1 class="h5 mb-3">Add a friend</h1>
+                <p class="text-muted small">Send a request by exact username. When they accept, you can chat in real time.</p>
+                <form method="post" action="{% url 'add_friend' %}">
+                    {% csrf_token %}
+                    <label class="form-label" for="username">Username</label>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" id="username" name="username" placeholder="classmate_username" required>
+                        <button class="btn btn-primary" type="submit">Send request</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="card shadow-sm mb-3">
+            <div class="card-header bg-white fw-semibold">Your friends</div>
+            <ul class="list-group list-group-flush">
+                {% for f in accepted %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>{% if f.from_user_id == user.id %}{{ f.to_user.username }}{% else %}{{ f.from_user.username }}{% endif %}</span>
+                        <a class="btn btn-sm btn-primary" href="{% url 'chat_room' f.id %}">Open chat</a>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item text-muted">No friends yet — add someone by username.</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% if pending_in %}
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-white fw-semibold">Requests for you</div>
+                <ul class="list-group list-group-flush">
+                    {% for f in pending_in %}
+                        <li class="list-group-item d-flex flex-wrap justify-content-between align-items-center gap-2">
+                            <span>{{ f.from_user.username }}</span>
+                            <span>
+                                <form method="post" action="{% url 'accept_friend' f.pk %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-success">Accept</button>
+                                </form>
+                                <form method="post" action="{% url 'decline_friend' f.pk %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary">Decline</button>
+                                </form>
+                            </span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        {% if pending_out %}
+            <div class="card shadow-sm">
+                <div class="card-header bg-white fw-semibold">Waiting on them</div>
+                <ul class="list-group list-group-flush">
+                    {% for f in pending_out %}
+                        <li class="list-group-item text-muted">{{ f.to_user.username }} — pending</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -5,8 +5,15 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import ProfileForm, ResourceForm, SupplyForm, UserRegistrationForm
+from .forms import (
+    ProfileForm,
+    ResourceForm,
+    SupplyForm,
+    UserRegistrationForm,
+    VerifyEmailForm,
+)
 from .models import Resource, Supply
+from . import verification
 
 
 def home(request):
@@ -29,11 +36,77 @@ def register(request):
             profile.learning_focus = (form.cleaned_data.get('learning_focus') or '').strip()
             profile.save()
             login(request, user)
-            messages.success(request, 'Welcome to StudyLink — your learning profile is set.')
-            return redirect('dashboard')
+            if user.email:
+                verification.send_verification_email(user)
+                messages.info(
+                    request,
+                    'Check your email for a 6-digit code to verify your account before using StudyLink.',
+                )
+            else:
+                messages.warning(request, 'Add an email on your profile to receive a verification code.')
+            return redirect('verify_email')
     else:
         form = UserRegistrationForm()
     return render(request, 'register.html', {'form': form})
+
+
+@login_required
+def verify_email(request):
+    profile = request.user.profile
+    if profile.email_verified:
+        return redirect('dashboard')
+    if not request.user.email:
+        messages.error(request, 'Your account has no email address; contact support or register again with an email.')
+        return redirect('home')
+
+    if request.method == 'POST':
+        form = VerifyEmailForm(request.POST)
+        if form.is_valid():
+            if verification.code_is_valid(profile, form.cleaned_data['code']):
+                verification.mark_verified(profile)
+                messages.success(request, 'Email verified. Welcome to StudyLink.')
+                return redirect('dashboard')
+            form.add_error('code', 'Invalid or expired code. Request a new one below.')
+    else:
+        form = VerifyEmailForm()
+
+    return render(
+        request,
+        'verify_email.html',
+        {
+            'form': form,
+            'email_masked': _mask_email(request.user.email),
+        },
+    )
+
+
+@login_required
+def resend_verification(request):
+    if request.method != 'POST':
+        return redirect('verify_email')
+    profile = request.user.profile
+    if profile.email_verified:
+        return redirect('dashboard')
+    if not request.user.email:
+        messages.error(request, 'No email on file.')
+        return redirect('verify_email')
+    if not verification.can_resend(profile):
+        messages.warning(request, 'Please wait a minute before requesting another code.')
+        return redirect('verify_email')
+    verification.send_verification_email(request.user)
+    messages.success(request, 'A new code was sent to your email.')
+    return redirect('verify_email')
+
+
+def _mask_email(email: str) -> str:
+    if not email or '@' not in email:
+        return '•••'
+    local, _, domain = email.partition('@')
+    if len(local) <= 2:
+        masked = local[0] + '•••'
+    else:
+        masked = local[0] + '•••' + local[-1]
+    return f'{masked}@{domain}'
 
 
 @login_required
