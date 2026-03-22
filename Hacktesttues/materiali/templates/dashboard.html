@@ -1,44 +1,64 @@
 {% extends "base.html" %}
+{% block title %}Home — StudyLink{% endblock %}
 {% block content %}
-    <h1>Welcome back, {{ user.username }}!</h1>
-    <p>You are currently learning: <strong>{{ user.profile.learning_focus }}</strong></p>
-    
-    <div class="row">
-        </div>
-{% endblock %}
-
-<h2>Welcome! You are learning: {{ major }}</h2>
-
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Upload Resource</button>
-</form>
-
-<hr>
-
-<h3>Recommended for You</h3>
-{% for item in resources %}
-    <div style="border: 1px solid #ccc; margin: 10px; padding: 10px;">
-        <h4>{{ item.title }} ({{ item.subject }})</h4>
-        <p>Uploaded by: {{ item.uploader.username }}</p>
-        <a href="{{ item.file.url }}" download>Download File</a>
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+    <div>
+        <h1 class="h3 mb-1">Hi, {{ user.username }}</h1>
+        <p class="text-muted mb-0">
+            {% if user_major or user_focus %}
+                You are studying
+                {% if user_major %}<strong>{{ user_major }}</strong>{% endif %}
+                {% if user_major and user_focus %} · {% endif %}
+                {% if user_focus %}<span class="text-secondary">{{ user_focus }}</span>{% endif %}
+            {% else %}
+                <a href="{% url 'profile_edit' %}">Add what you are learning</a> to get personalized recommendations.
+            {% endif %}
+        </p>
     </div>
-{% empty %}
-    <p>No resources found for your major yet. Be the first to upload!</p>
-{% endfor %}
-
-<div class="card">
-    <h3>{{ item.title }}</h3>
-    <p>Uploaded by: {{ item.uploader.username }}</p>
-
-    {% if item.uploader == user %}
-        <div class="owner-controls">
-            <a href="{% url 'edit_resource' item.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
-            <form action="{% url 'delete_resource' item.pk %}" method="POST" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-            </form>
-        </div>
-    {% endif %}
+    <div class="d-flex flex-wrap gap-2">
+        <a href="{% url 'profile_edit' %}" class="btn btn-outline-primary btn-sm">Edit learning profile</a>
+        <a href="{% url 'add_resource' %}" class="btn btn-primary btn-sm">Upload material</a>
+        <a href="{% url 'marketplace' %}" class="btn btn-outline-secondary btn-sm">Browse supplies</a>
+    </div>
 </div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white fw-semibold">Recommended for you</div>
+            <div class="card-body">
+                <p class="text-muted small mb-3">Materials whose subject matches your profile or were uploaded by people in the same field.</p>
+                {% for item in recommended %}
+                    <div class="border rounded p-3 mb-3 bg-white">
+                        <div class="d-flex justify-content-between flex-wrap gap-2">
+                            <div>
+                                <h2 class="h6 mb-1">{{ item.title }}</h2>
+                                <span class="badge text-bg-light">{{ item.subject }}</span>
+                                {% if item.course_code %}<span class="badge text-bg-secondary">{{ item.course_code }}</span>{% endif %}
+                                <p class="small text-muted mb-0 mt-2">Uploaded by {{ item.uploader.username }}</p>
+                            </div>
+                            <div>
+                                <a class="btn btn-sm btn-outline-primary" href="{{ item.file.url }}" target="_blank" rel="noopener">Open / download</a>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-muted mb-0">No matches yet. Try updating <a href="{% url 'profile_edit' %}">your learning profile</a> or <a href="{% url 'add_resource' %}">upload a handout</a> for others.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="h6">Quick links</h2>
+                <ul class="list-unstyled small mb-0">
+                    <li class="mb-2"><a href="{% url 'resource_list' %}">Search all materials</a></li>
+                    <li class="mb-2"><a href="{% url 'marketplace' %}">Supplies from your field</a></li>
+                    <li><a href="{% url 'add_supply' %}">List something you can lend or sell</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

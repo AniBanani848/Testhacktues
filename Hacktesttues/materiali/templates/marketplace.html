@@ -1,28 +1,65 @@
 {% extends "base.html" %}
+{% block title %}Supplies — StudyLink{% endblock %}
 {% block content %}
-    <h1>Marketplace</h1>
-    <p>Find and share study supplies with your peers!</p>
-{% endblock %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+    <div>
+        <h1 class="h3 mb-1">Supplies marketplace</h1>
+        <p class="text-muted small mb-0">
+            {% if user_major or user_focus %}
+                Showing listings tied to <strong>{{ user_major|default:"your focus" }}</strong>
+                {% if user_focus %}({{ user_focus }}){% endif %} when possible.
+            {% else %}
+                <a href="{% url 'profile_edit' %}">Set what you study</a> to prioritize peers in your field.
+            {% endif %}
+        </p>
+    </div>
+    <a href="{% url 'add_supply' %}" class="btn btn-primary btn-sm">List a supply</a>
+</div>
 
-<form method="GET" action="">
-    <input type="text" name="search" placeholder="Search for books, calculators...">
-    <button type="submit">Search</button>
+<form method="get" class="row g-2 mb-3">
+    {% if show_all %}<input type="hidden" name="all" value="1">{% endif %}
+    <div class="col-md-6">
+        <input type="search" name="search" class="form-control" placeholder="Search items…" value="{{ search }}">
+    </div>
+    <div class="col-md-6 d-flex flex-wrap gap-2 align-items-center">
+        <button type="submit" class="btn btn-outline-primary">Search</button>
+        {% if show_all %}
+            <a href="{% url 'marketplace' %}{% if search %}?search={{ search|urlencode }}{% endif %}" class="btn btn-outline-secondary btn-sm">Prioritize my field</a>
+        {% else %}
+            <a href="{% url 'marketplace' %}?all=1{% if search %}&search={{ search|urlencode }}{% endif %}" class="btn btn-outline-secondary btn-sm">Show all listings</a>
+        {% endif %}
+    </div>
 </form>
 
-<div class="supply-grid" style="display: flex; flex-wrap: wrap; gap: 20px;">
+{% if peers_first %}
+    <div class="alert alert-info py-2 small mb-3">These listings match your study area or are from students in the same field.</div>
+{% elif fallback_all %}
+    <div class="alert alert-light border small mb-3">No listings matched your field yet — showing everyone. Try “Show all listings” or add your own.</div>
+{% endif %}
+
+<div class="row g-3">
     {% for item in supplies %}
-    <div class="supply-card" style="border: 1px solid #ddd; padding: 15px; border-radius: 8px; width: 250px;">
-        <h3>{{ item.item_name }}</h3>
-        <p>{{ item.description|truncatewords:15 }}</p>
-        <p><strong>Owner:</strong> {{ item.owner.username }}</p>
-        <p><strong>Learning:</strong> {{ item.owner.profile.learning_focus }}</p>
-        
-        <a href="mailto:{{ item.owner.email }}?subject=Interest in {{ item.item_name }}" 
-           style="background: #28a745; color: white; padding: 10px; text-decoration: none; display: block; text-align: center;">
-           Contact Owner
-        </a>
-    </div>
+        <div class="col-md-6 col-xl-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <h2 class="h6">{{ item.item_name }}</h2>
+                    <p class="small flex-grow-1">{{ item.description|truncatewords:40 }}</p>
+                    <p class="small text-muted mb-2">
+                        <strong>Listed by:</strong> {{ item.owner.username }}<br>
+                        {% if item.subject_area %}
+                            <strong>Study area:</strong> {{ item.subject_area }}
+                        {% else %}
+                            <span class="text-muted">No study area set</span>
+                        {% endif %}
+                    </p>
+                    {% if item.owner.email %}
+                        <a class="btn btn-sm btn-success" href="mailto:{{ item.owner.email }}?subject=StudyLink: {{ item.item_name }}">Contact</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     {% empty %}
-    <p>No supplies found. Check back later!</p>
+        <p class="text-muted">No supplies available. <a href="{% url 'add_supply' %}">Be the first to list one</a>.</p>
     {% endfor %}
 </div>
+{% endblock %}

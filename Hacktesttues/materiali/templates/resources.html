@@ -1,16 +1,43 @@
-<form method="GET" action="{% url 'resource_list' %}">
-    <input type="text" name="q" placeholder="Search by Course Code (e.g. CS101)..." value="{{ query }}">
-    <button type="submit">Search</button>
+{% extends "base.html" %}
+{% block title %}Materials — StudyLink{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <h1 class="h3 mb-0">Class materials</h1>
+    <a href="{% url 'add_resource' %}" class="btn btn-primary btn-sm">Upload material</a>
+</div>
+
+<form method="get" class="row g-2 mb-4">
+    <div class="col-md-8">
+        <input type="search" name="q" class="form-control" placeholder="Search by title, subject, or course code…" value="{{ query }}">
+    </div>
+    <div class="col-md-4">
+        <button type="submit" class="btn btn-outline-primary w-100">Search</button>
+    </div>
 </form>
 
-<hr>
-
-{% for res in resources %}
-    <div class="card">
-        <h3>{{ res.title }}</h3>
-        <span class="badge">{{ res.course_code }}</span> <p>Subject: {{ res.subject }}</p>
-        <a href="{{ res.file.url }}">Download</a>
-    </div>
-{% empty %}
-    <p>No resources found for "{{ query }}".</p>
-{% endfor %}
+<div class="row g-3">
+    {% for res in resources %}
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h2 class="h6">{{ res.title }}</h2>
+                    <p class="small text-muted mb-2">
+                        {% if res.course_code %}<span class="badge bg-secondary">{{ res.course_code }}</span>{% endif %}
+                        <span class="badge bg-light text-dark">{{ res.subject }}</span>
+                    </p>
+                    <p class="small mb-3">From {{ res.uploader.username }}</p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ res.file.url }}" class="btn btn-sm btn-primary" target="_blank" rel="noopener">Download</a>
+                        {% if res.uploader_id == user.id %}
+                            <a href="{% url 'edit_resource' res.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                            <a href="{% url 'delete_resource' res.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <p class="text-muted">No materials found{% if query %} for “{{ query }}”{% endif %}. <a href="{% url 'add_resource' %}">Upload the first one</a>.</p>
+    {% endfor %}
+</div>
+{% endblock %}
