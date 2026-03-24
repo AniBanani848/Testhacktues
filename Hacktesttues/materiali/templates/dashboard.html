@@ -19,6 +19,7 @@
         <a href="{% url 'profile_edit' %}" class="btn btn-outline-primary btn-sm">Edit learning profile</a>
         <a href="{% url 'add_resource' %}" class="btn btn-primary btn-sm">Upload material</a>
         <a href="{% url 'marketplace' %}" class="btn btn-outline-secondary btn-sm">Browse supplies</a>
+        <a href="{% url 'friend_list' %}" class="btn btn-outline-dark btn-sm">Friends chat</a>
     </div>
 </div>
 
@@ -55,6 +56,7 @@
                 <ul class="list-unstyled small mb-0">
                     <li class="mb-2"><a href="{% url 'resource_list' %}">Search all materials</a></li>
                     <li class="mb-2"><a href="{% url 'marketplace' %}">Supplies from your field</a></li>
+                    <li class="mb-2"><a href="{% url 'friend_list' %}">Open friends and chat</a></li>
                     <li><a href="{% url 'add_supply' %}">List something you can lend or sell</a></li>
                 </ul>
             </div>
